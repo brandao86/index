@@ -34,16 +34,60 @@
   <div id='map'></div>
   <div id='layer-menu'>
     <div class='layer-option'>
-      <input type='checkbox' id='camada1' />
-      <label for='camada1'>Camada 1</label>
+      <input type='checkbox' id='localidades' />
+      <label for='localidades'>Localidades</label>
     </div>
     <div class='layer-option'>
-      <input type='checkbox' id='camada2' />
-      <label for='camada2'>Camada 2</label>
+      <input type='checkbox' id='pontos_mapbox' />
+      <label for='pontos_mapbox'>Pontos MapBox</label>
     </div>
     <div class='layer-option'>
-      <input type='checkbox' id='camada3' />
-      <label for='camada3'>Camada 3</label>
+      <input type='checkbox' id='sedes_municipais' />
+      <label for='sedes_municipais'>Sedes Municipais</label>
+    </div>
+    <div class='layer-option'>
+      <input type='checkbox' id='aeroportos' />
+      <label for='aeroportos'>Aeroportos e Pistas de Pouso</label>
+    </div>
+    <div class='layer-option'>
+      <input type='checkbox' id='atrativos' />
+      <label for='atrativos'>Atrativos</label>
+    </div>
+    <div class='layer-option'>
+      <input type='checkbox' id='canal_sertao' />
+      <label for='canal_sertao'>Canal do Sertão</label>
+    </div>
+    <div class='layer-option'>
+      <input type='checkbox' id='corpos_dagua' />
+      <label for='corpos_dagua'>Corpos D'água</label>
+    </div>
+    <div class='layer-option'>
+      <input type='checkbox' id='dunas' />
+      <label for='dunas'>Dunas</label>
+    </div>
+    <div class='layer-option'>
+      <input type='checkbox' id='usinas_hidreletricas' />
+      <label for='usinas_hidreletricas'>Usinas Hidrelétricas</label>
+    </div>
+    <div class='layer-option'>
+      <input type='checkbox' id='moldura_alagoas' />
+      <label for='moldura_alagoas'>Moldura Alagoas</label>
+    </div>
+    <div class='layer-option'>
+      <input type='checkbox' id='municipios_2022' />
+      <label for='municipios_2022'>Municípios 2022</label>
+    </div>
+    <div class='layer-option'>
+      <input type='checkbox' id='portos_ancoradoros' />
+      <label for='portos_ancoradoros'>Portos e Ancoradouros</label>
+    </div>
+    <div class='layer-option'>
+      <input type='checkbox' id='recifes' />
+      <label for='recifes'>Recifes</label>
+    </div>
+    <div class='layer-option'>
+      <input type='checkbox' id='rodovias' />
+      <label for='rodovias'>Rodovias</label>
     </div>
   </div>
   <script>
@@ -56,95 +100,60 @@
     });
 
     map.on('load', function () {
-      var camada1Checkbox = document.getElementById('camada1');
-      camada1Checkbox.addEventListener('change', function () {
-        if (this.checked) {
-          map.addSource('camada1', {
-            type: 'geojson',
-            data: 'https://raw.githubusercontent.com/brandao86/mabx/main/map.geojson'
-          });
+      var layers = [
+        { id: 'localidades', url: 'https://raw.githubusercontent.com/brandao86/index/main/Localidades.geojson', type: 'line', color: '#ff0000' },
+        { id: 'pontos_mapbox', url: 'https://raw.githubusercontent.com/brandao86/index/main/Pontos_MapBox.geojson', type: 'fill', color: '#00ff00' },
+        { id: 'sedes_municipais', url: 'https://raw.githubusercontent.com/brandao86/index/main/Sedes_municipais.geojson', type: 'circle', color: '#0000ff' },
+        { id: 'aeroportos', url: 'https://raw.githubusercontent.com/brandao86/index/main/aeroportos-e-pistas-de-pouso_ibge-2022.geojson', type: 'circle', color: '#ff00ff' },
+        { id: 'atrativos', url: 'https://raw.githubusercontent.com/brandao86/index/main/atrativos.json', type: 'circle', color: '#ffff00' },
+        { id: 'canal_sertao', url: 'https://raw.githubusercontent.com/brandao86/index/main/canal_do_sertao.geojson', type: 'line', color: '#00ffff' },
+        { id: 'corpos_dagua', url: 'https://raw.githubusercontent.com/brandao86/index/main/corpos_dagua.geojson', type: 'fill', color: '#ff00ff' },
+        { id: 'dunas', url: 'https://raw.githubusercontent.com/brandao86/index/main/dunas.geojson', type: 'fill', color: '#ffff00' },
+        { id: 'usinas_hidreletricas', url: 'https://raw.githubusercontent.com/brandao86/index/main/geojson-usinas-hidreletricas-de-alagoas.geojson', type: 'circle', color: '#00ffff' },
+        { id: 'moldura_alagoas', url: 'https://raw.githubusercontent.com/brandao86/index/main/moldura_alagoas.geojson', type: 'line', color: '#ff0000' },
+        { id: 'municipios_2022', url: 'https://raw.githubusercontent.com/brandao86/index/main/municipios_2022.geojson', type: 'fill', color: '#00ff00' },
+        { id: 'portos_ancoradoros', url: 'https://raw.githubusercontent.com/brandao86/index/main/portos_ancoradoros.geojson', type: 'circle', color: '#0000ff' },
+        { id: 'recifes', url: 'https://raw.githubusercontent.com/brandao86/index/main/recifes.geojson', type: 'fill', color: '#ff00ff' },
+        { id: 'rodovias', url: 'https://raw.githubusercontent.com/brandao86/index/main/rodovias.geojson', type: 'line', color: '#ffff00' },
+      ];
 
-          map.addLayer({
-            id: 'camada1',
-            type: 'line',
-            source: 'camada1',
-            paint: {
-              'line-color': '#ff0000',
-              'line-width': 2
-            }
-          });
+      layers.forEach(function (layer) {
+        var checkbox = document.getElementById(layer.id);
+        checkbox.addEventListener('change', function () {
+          if (this.checked) {
+            map.addSource(layer.id, {
+              type: 'geojson',
+              data: layer.url
+            });
 
-          var bounds = map.querySourceFeatures('camada1').reduce(function (bounds, feature) {
-            return bounds.extend(feature.geometry.coordinates);
-          }, new mapboxgl.LngLatBounds());
+            map.addLayer({
+              id: layer.id,
+              type: layer.type,
+              source: layer.id,
+              paint: layer.type === 'line' ? {
+                'line-color': layer.color,
+                'line-width': 2
+              } : layer.type === 'fill' ? {
+                'fill-color': layer.color,
+                'fill-opacity': 0.5
+              } : {
+                'circle-color': layer.color,
+                'circle-radius': 6
+              }
+            });
 
-          map.fitBounds(bounds, { padding: 50 });
-        } else {
-          map.removeLayer('camada1');
-          map.removeSource('camada1');
-        }
-      });
+            var bounds = map.querySourceFeatures(layer.id).reduce(function (bounds, feature) {
+              return bounds.extend(feature.geometry.coordinates);
+            }, new mapboxgl.LngLatBounds());
 
-      var camada2Checkbox = document.getElementById('camada2');
-      camada2Checkbox.addEventListener('change', function () {
-        if (this.checked) {
-          map.addSource('camada2', {
-            type: 'geojson',
-            data: 'https://raw.githubusercontent.com/brandao86/mabx/main/grotas100.geojson'
-          });
-
-          map.addLayer({
-            id: 'camada2',
-            type: 'fill',
-            source: 'camada2',
-            paint: {
-              'fill-color': '#00ff00',
-              'fill-opacity': 0.5
-            }
-          });
-
-          var bounds = map.querySourceFeatures('camada2').reduce(function (bounds, feature) {
-            return bounds.extend(feature.geometry.coordinates);
-          }, new mapboxgl.LngLatBounds());
-
-          map.fitBounds(bounds, { padding: 50 });
-        } else {
-          map.removeLayer('camada2');
-          map.removeSource('camada2');
-        }
-      });
-
-      var camada3Checkbox = document.getElementById('camada3');
-      camada3Checkbox.addEventListener('change', function () {
-        if (this.checked) {
-          map.addSource('camada3', {
-            type: 'geojson',
-            data: 'https://raw.githubusercontent.com/brandao86/mabx/main/saude.geojson'
-          });
-
-          map.addLayer({
-            id: 'camada3',
-            type: 'circle',
-            source: 'camada3',
-            paint: {
-              'circle-color': '#0000ff',
-              'circle-radius': 6
-            }
-          });
-
-          var bounds = map.querySourceFeatures('camada3').reduce(function (bounds, feature) {
-            return bounds.extend(feature.geometry.coordinates);
-          }, new mapboxgl.LngLatBounds());
-
-          map.fitBounds(bounds, { padding: 50 });
-        } else {
-          map.removeLayer('camada3');
-          map.removeSource('camada3');
-        }
+            map.fitBounds(bounds, { padding: 50 });
+          } else {
+            map.removeLayer(layer.id);
+            map.removeSource(layer.id);
+          }
+        });
       });
     });
   </script>
 </body>
 </html>
-
-
