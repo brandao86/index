@@ -9,6 +9,15 @@
     <link href='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.css' rel='stylesheet' />
     <link href='https://fonts.googleapis.com/css?family=Oswald' rel='stylesheet'>
     <style>
+	#logo {
+    		position: absolute;
+    		bottom: 10px;
+    		right: 10px;
+    		width: 190px;
+   		 padding: 15px 0;
+    		z-index: 1;
+		}
+
         body,
         html {
             margin: 0;
@@ -92,6 +101,7 @@
             <!-- Options will be added dynamically -->
         </select>
     </div>
+	<img id="logo" src="https://github.com/brandao86/index/blob/main/logo-dados-informacoes-azul.png?raw=true" alt="Logo">
     <script>
         function toggleMenu() {
             const menu = document.getElementById('layer-menu');
