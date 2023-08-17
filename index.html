@@ -1,212 +1,281 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <title>Alagoas em Dados</title>
-  <meta charset='utf-8' />
-  <meta name='viewport' content='width=device-width, initial-scale=1.0' />
-  <script src='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.js'></script>
-  <link href='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.css' rel='stylesheet' />
-  <style>
-    body, html {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-    }
-    #map {
-      width: 100%;
-      height: 100%;
-    }
-    #layer-menu {
-      position: absolute;
-      top: 150px;
-      left: 10px;
-      z-index: 1;
-      background-color: #ffffff;
-      padding: 10px;
-      border-radius: 5px;
-    }
-    .layer-option {
-      margin-bottom: 5px;
-    }
-    #map-title {
-      position: absolute;
-      top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 1;
-      background-color: rgba(255, 255, 255, 0.7);
-      padding: 10px;
-      border-radius: 5px;
-      text-align: center;
-      text-transform: uppercase;
-      font-size: 20px;
-    }
-  </style>
+    <title>Alagoas em Dados</title>
+    <meta charset='utf-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.css' rel='stylesheet' />
+    <link href='https://fonts.googleapis.com/css?family=Oswald' rel='stylesheet'>
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Oswald';
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        #layer-menu {
+            position: absolute;
+            top: 150px;
+            left: 0px;
+            z-index: 1;
+            background-color: #FAFAFA;
+            padding: 10px;
+            border-radius: 0px 0px 15px 0px;
+            transition: left 0.3s;
+            box-shadow: 1px 1px 6px rgb(0 0 0 / 20%);
+        }
+
+        .layer-option {
+            margin-bottom: 5px;
+        }
+
+        #map-title {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            text-transform: uppercase;
+            font-size: 30px;
+            font-family: 'Oswald';
+            color: #FAFAFA;
+            text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        #map-subtitle {
+            font-size: 22px;
+            font-family: 'Oswald';
+            color: #F5F5F5;
+        }
+
+        #toggle-btn {
+            position: absolute;
+            top: -15px;
+            left: 280px;
+            z-index: 2;
+            background-color: #4e9f50;
+            padding: 5px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0px 0px 3px #00000029;
+            font-size: 30px;
+        }
+
+        @media (max-width: 768px) {
+            #layer-menu {
+                left: -310px;
+            }
+        }
+    </style>
 </head>
+
 <body>
-  <div id='map'></div>
-  <div id='map-title'>Mapa Político Administrativo de Alagoas</div>
-  <div id='layer-menu'>
-    <label for="admin-headquarters">Município: </label>
-    <select id="admin-headquarters">
-      <!-- Options will be added dynamically -->
-    </select>
-  </div>
-  <script>
-    mapboxgl.accessToken = 'pk.eyJ1IjoiYnJhbmRhbzg2IiwiYSI6ImNsaXhib3k4MzA1ZmUzcHIxN3J0Z3k2N2YifQ.-g2ePtoRTVJ7ezZd8LqVkA';
-    var map = new mapboxgl.Map({
-      container: 'map',
-      style: 'mapbox://styles/brandao86/clixi4sz002k301pd9icehzkl',
-      center: [-36.900, -9.60],
-      zoom: 7.8
-    });
-
-    map.on('load', function () {
-       var layers = [
-        { id: 'Localidades', url: 'https://raw.githubusercontent.com/brandao86/index/main/Localidades.geojson', type: 'circle', color: '#000000' },
-        { id: 'Sedes municipais', url: 'https://raw.githubusercontent.com/brandao86/index/main/Sedes_municipais.geojson', type: 'circle', color: '#0000ff' },
-        { id: 'Aeroportos', url: 'https://raw.githubusercontent.com/brandao86/index/main/aeroportos-e-pistas-de-pouso_ibge-2022.geojson', type: 'circle', color: '#ff0000' },
-        { id: 'Atrativos turísticos', url: 'https://raw.githubusercontent.com/brandao86/index/main/atrativos.json', type: 'circle', color: '#ff0000' },
-        { id: 'Canal do Sertão', url: 'https://raw.githubusercontent.com/brandao86/index/main/canal_do_sertao.geojson', type: 'line', color: '#0000ff' },
-        { id: 'Corpos dágua', url: 'https://raw.githubusercontent.com/brandao86/index/main/corpos_dagua.geojson', type: 'fill', color: '#0000ff' },
-        { id: 'Dunas', url: 'https://raw.githubusercontent.com/brandao86/index/main/dunas.geojson', type: 'fill', color: '#D2B48C' },
-        { id: 'Usinas hidrelétricas', url: 'https://raw.githubusercontent.com/brandao86/index/main/geojson-usinas-hidreletricas-de-alagoas.geojson', type: 'circle', color: '#FF0000' },
-        { id: 'Moldura Alagoas', url: 'https://raw.githubusercontent.com/brandao86/index/main/moldura_alagoas.geojson', type: 'fill', color: '#cccccc' },
-        { id: 'Municípios', url: 'https://raw.githubusercontent.com/brandao86/index/main/municipios_2022.geojson', type: 'line', color: '#000000' },
-        { id: 'Portos e ancoradoros', url: 'https://raw.githubusercontent.com/brandao86/index/main/portos_ancoradoros.geojson', type: 'circle', color: '#FF0000' },
-        { id: 'Rodovias', url: 'https://raw.githubusercontent.com/brandao86/index/main/rodovias.geojson', type: 'line', color: '#FF0000' },
-        { id: 'Ferrovia', url: 'https://raw.githubusercontent.com/brandao86/index/main/ferrovias_ibge_2022.geojson', type: 'line', color: '#FF0000' },
-      ];
-      
-      layers.forEach(function (layer) {
-        var checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.id = layer.id;
-        var label = document.createElement('label');
-        label.htmlFor = layer.id;
-        label.appendChild(document.createTextNode(' ' + layer.id));
-
-        var div = document.createElement('div');
-        div.className = 'layer-option';
-        div.appendChild(checkbox);
-        div.appendChild(label);
-
-        if (layer.type === 'line' || layer.type === 'circle') {
-          var sizeSlider = document.createElement('input');
-          sizeSlider.type = 'range';
-          sizeSlider.id = layer.id + '-size';
-          sizeSlider.min = '1';
-          sizeSlider.max = '10';
-          sizeSlider.value = '2';
-          div.appendChild(sizeSlider);
-
-          sizeSlider.addEventListener('change', function () {
-            map.setPaintProperty(layer.id, layer.type === 'line' ? 'line-width' : 'circle-radius', parseInt(this.value));
-          });
-        } else if (layer.type === 'fill') {
-          var opacitySlider = document.createElement('input');
-          opacitySlider.type = 'range';
-          opacitySlider.id = layer.id + '-opacity';
-          opacitySlider.min = '0';
-          opacitySlider.max = '1';
-          opacitySlider.step = '0.1';
-          opacitySlider.value = '0.5';
-          div.appendChild(opacitySlider);
-
-          opacitySlider.addEventListener('change', function () {
-            map.setPaintProperty(layer.id, 'fill-opacity', parseFloat(this.value));
-          });
-        }
-
-        document.getElementById('layer-menu').appendChild(div);
-
-        map.addSource(layer.id, { type: 'geojson', data: layer.url });
-        map.addLayer({
-          'id': layer.id,
-          'type': layer.type,
-          'source': layer.id,
-          'layout': {},
-          'paint': {
-            [layer.type + '-color']: layer.color,
-            [layer.type + '-opacity']: layer.type === 'fill' ? 0.5 : 1,
-          }
-        });
-        map.setLayoutProperty(layer.id, 'visibility', 'none');
-
-        checkbox.addEventListener('change', function (e) {
-          map.setLayoutProperty(layer.id, 'visibility', e.target.checked ? 'visible' : 'none');
-        });
-      });
-
-      // Active Popup variable
-      let activePopup;
-
-      map.on('mousemove', 'Localidades', function (e) {
-        if (e.features.length > 0) {
-            var feature = e.features[0];
-
-            // If there's an active popup, remove it
-            if (activePopup) {
-                activePopup.remove();
+    <div id='map'></div>
+    <div id='map-title'><b>Mapa Político-Admnistrativo</b> <i>Interativo</i><br/><div id='map-subtitle'>Estado de Alagoas</div></div>
+    <div id='layer-menu'>
+        <div id='toggle-btn' onclick="toggleMenu()">≡</div>
+        <label for="admin-headquarters">Município: </label>
+        <select id="admin-headquarters">
+          <option value="Alagoas" data-lon="-36.625" data-lat="-9.60">Alagoas</option>
+            <!-- Options will be added dynamically -->
+        </select>
+    </div>
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById('layer-menu');
+            if (menu.style.left === '-310px') {
+                menu.style.left = '0px';
+            } else {
+                menu.style.left = '-310px';
             }
-
-            activePopup = new mapboxgl.Popup({ offset: [0, -15] })
-                .setLngLat(e.lngLat)
-                .setHTML(
-                    '<h3>' + feature.properties.identifica + '</h3>' +
-                    '<p><strong>Tipo:</strong> ' + feature.properties.tipolocali + '</p>' +
-                    '<p><strong>Latitude:</strong> ' + feature.properties.latitude + '</p>' +
-                    '<p><strong>Longitude:</strong> ' + feature.properties.longitude + '</p>' +
-                    '<p><strong>Município:</strong> ' + feature.properties.NM_MUN + '</p>'
-                )
-                .addTo(map);
         }
-      });
 
-      // This code will remove the popup when the mouse is no longer over the layer.
-      map.on('mouseleave', 'Localidades', function() {
-        map.getCanvas().style.cursor = '';
-        if (activePopup) {
-            activePopup.remove();
-        }
-      });
+        mapboxgl.accessToken = 'pk.eyJ1IjoiYnJhbmRhbzg2IiwiYSI6ImNsaXhib3k4MzA1ZmUzcHIxN3J0Z3k2N2YifQ.-g2ePtoRTVJ7ezZd8LqVkA';
+        var map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/brandao86/clixi4sz002k301pd9icehzkl',
+            center: [-36.625, -9.60],
+            zoom: 7.8
+        });
 
-      // Load sede administrativas and populate the dropdown menu
-      fetch('https://raw.githubusercontent.com/brandao86/index/main/Sedes_municipais.geojson')
-        .then(response => response.json())
-        .then(data => {
-          const adminHeadquartersSelect = document.getElementById('admin-headquarters');
-          data.features.forEach(feature => {
-            const sedeAdministrativa = feature.properties.identifica;
-            const coordinates = feature.geometry.coordinates;
-            if (sedeAdministrativa && !adminHeadquartersSelect.querySelector(`option[value="${sedeAdministrativa}"]`)) {
-              const option = document.createElement('option');
-              option.value = sedeAdministrativa;
-              option.textContent = sedeAdministrativa;
-              adminHeadquartersSelect.appendChild(option);
-              // Store the coordinates in the option element for easy access
-              option.setAttribute('data-lon', coordinates[0]);
-              option.setAttribute('data-lat', coordinates[1]);
-            }
-          });
-        })
-        .catch(error => console.error('Error fetching data:', error));
+        map.on('load', function () {
+            var layers = [
+                { id: 'Localidades', visibility: false, url: 'https://raw.githubusercontent.com/brandao86/index/main/Localidades.geojson', type: 'circle', color: '#000000' },
+                { id: 'Sedes municipais', visibility: false, url: 'https://raw.githubusercontent.com/brandao86/index/main/Sedes_municipais.geojson', type: 'circle', color: '#0000ff' },
+                { id: 'Aeroportos', visibility: false, url: 'https://raw.githubusercontent.com/brandao86/index/main/aeroportos-e-pistas-de-pouso_ibge-2022.geojson', type: 'circle', color: '#ff0000' },
+                { id: 'Atrativos turísticos', visibility: false, url: 'https://raw.githubusercontent.com/brandao86/index/main/atrativos.json', type: 'circle', color: '#ff0000' },
+                { id: 'Canal do Sertão', visibility: false, url: 'https://raw.githubusercontent.com/brandao86/index/main/canal_do_sertao.geojson', type: 'line', color: '#0000ff' },
+                { id: 'Corpos dágua', visibility: false, url: 'https://raw.githubusercontent.com/brandao86/index/main/corpos_dagua.geojson', type: 'fill', color: '#0000ff' },
+                { id: 'Dunas', visibility: false, url: 'https://raw.githubusercontent.com/brandao86/index/main/dunas.geojson', type: 'fill', color: '#D2B48C' },
+                { id: 'Usinas hidrelétricas', visibility: false, url: 'https://raw.githubusercontent.com/brandao86/index/main/geojson-usinas-hidreletricas-de-alagoas.geojson', type: 'circle', color: '#FF0000' },
+                { id: 'Moldura Alagoas', visibility: true, url: 'https://raw.githubusercontent.com/brandao86/index/main/moldura_alagoas.geojson', type: 'fill', color: '#E0E0E0' },
+                { id: 'Municípios', visibility: true, url: 'https://raw.githubusercontent.com/brandao86/index/main/municipios_2022.geojson', type: 'line', color: '#000000' },
+                { id: 'Portos e ancoradoros', visibility: false, url: 'https://raw.githubusercontent.com/brandao86/index/main/portos_ancoradoros.geojson', type: 'circle', color: '#FF0000' },
+                { id: 'Rodovias', visibility: false, url: 'https://raw.githubusercontent.com/brandao86/index/main/rodovias.geojson', type: 'line', color: '#FF0000' },
+                { id: 'Ferrovia', visibility: false, url: 'https://raw.githubusercontent.com/brandao86/index/main/ferrovias_ibge_2022.geojson', type: 'line', color: '#FF0000' },
+            ];
 
-      // Event listener for the dropdown menu
-      var adminHeadquartersSelect = document.getElementById('admin-headquarters');
-      adminHeadquartersSelect.addEventListener('change', function (e) {
-        var selectedOption = e.target.options[e.target.selectedIndex];
-        var lon = parseFloat(selectedOption.getAttribute('data-lon'));
-        var lat = parseFloat(selectedOption.getAttribute('data-lat'));
+            var checkboxLayers = {};  // Para rastrear o estado dos checkboxes
 
-        if (!isNaN(lon) && !isNaN(lat)) {
-          map.flyTo({
-            center: [lon, lat],
-            zoom: 10, // You can adjust the zoom level as needed
-          });
-        }
-      });
-    });
-  </script>
+            layers.forEach(function (layer) {
+                
+                var checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = layer.id;
+                checkbox.checked = layer.visibility;  // Inicialmente, todas as camadas estão ativas
+                checkboxLayers[layer.id] = true; // Rastrear o estado do checkbox
+
+                checkbox.addEventListener('change', function () {
+                    var isChecked = this.checked;
+
+                    if (isChecked) {
+                        map.setLayoutProperty(layer.id, 'visibility', 'visible');
+                    } else {
+                        map.setLayoutProperty(layer.id, 'visibility', 'none');
+                    }
+
+                    checkboxLayers[layer.id] = isChecked;
+                });
+                
+                var label = document.createElement('label');
+                label.htmlFor = layer.id;
+                label.appendChild(document.createTextNode(' ' + layer.id));
+
+                var div = document.createElement('div');
+                div.className = 'layer-option';
+                div.appendChild(checkbox);
+                div.appendChild(label);
+
+                if (layer.type === 'line' || layer.type === 'circle') {
+                    var sizeSlider = document.createElement('input');
+                    sizeSlider.type = 'range';
+                    sizeSlider.id = layer.id + '-size';
+                    sizeSlider.min = '1';
+                    sizeSlider.max = '10';
+                    sizeSlider.value = '2';
+                    div.appendChild(sizeSlider);
+
+                    sizeSlider.addEventListener('change', function () {
+                        map.setPaintProperty(layer.id, layer.type === 'line' ? 'line-width' : 'circle-radius', parseInt(this.value));
+                    });
+
+                    var initialOpacity = parseFloat(sizeSlider.value);
+                } else if (layer.type === 'fill') {
+                  var opacitySlider = document.createElement('input');
+                  opacitySlider.type = 'range';
+                  opacitySlider.id = layer.id + '-opacity';
+                  opacitySlider.min = '0';
+                  opacitySlider.max = '1';
+                  opacitySlider.step = '0.1';
+                  opacitySlider.value = '0.5';
+                  div.appendChild(opacitySlider);
+
+                  opacitySlider.addEventListener('change', function () {
+                      map.setPaintProperty(layer.id, 'fill-opacity', parseFloat(this.value));
+                  });
+
+                  // Capture the initial opacity value for the Moldura Alagoas layer
+                  var initialOpacity = parseFloat(opacitySlider.value);
+                }
+
+                document.getElementById('layer-menu').appendChild(div);
+                
+                map.addSource(layer.id, {
+                    type: 'geojson',
+                    data: layer.url
+                });
+
+                map.addLayer({
+                    'id': layer.id,
+                    'type': layer.type,
+                    'source': layer.id,
+                    'layout': {
+                        'visibility': layer.visibility ? 'visible' : 'none'
+                    },
+                    'paint': {
+                        [layer.type === 'fill' ? 'fill-color' : layer.type === 'line' ? 'line-color' : 'circle-color']: layer.color,
+                        [layer.type === 'fill' ? 'fill-opacity' : layer.type === 'line' ? 'line-width' : 'circle-radius']: initialOpacity
+                    }
+                });
+            });
+
+            let activePopup;
+
+            map.on('mousemove', 'Localidades', function (e) {
+                if (e.features.length > 0) {
+                    var feature = e.features[0];
+
+                    if (activePopup) {
+                        activePopup.remove();
+                    }
+
+                    activePopup = new mapboxgl.Popup({ offset: [0, -15] })
+                        .setLngLat(e.lngLat)
+                        .setHTML(
+                            '<h3>' + feature.properties.identifica + '</h3>' +
+                            '<p><strong>Tipo:</strong> ' + feature.properties.tipolocali + '</p>' +
+                            '<p><strong>Latitude:</strong> ' + feature.properties.latitude + '</p>' +
+                            '<p><strong>Longitude:</strong> ' + feature.properties.longitude + '</p>' +
+                            '<p><strong>Município:</strong> ' + feature.properties.NM_MUN + '</p>'
+                        )
+                        .addTo(map);
+                }
+            });
+
+            map.on('mouseleave', 'Localidades', function () {
+                map.getCanvas().style.cursor = '';
+                if (activePopup) {
+                    activePopup.remove();
+                }
+            });
+
+            fetch('https://raw.githubusercontent.com/brandao86/index/main/Sedes_municipais.geojson')
+                .then(response => response.json())
+                .then(data => {
+                    const adminHeadquartersSelect = document.getElementById('admin-headquarters');
+                    data.features.forEach(feature => {
+                        const sedeAdministrativa = feature.properties.identifica;
+                        const coordinates = feature.geometry.coordinates;
+                        if (sedeAdministrativa && !adminHeadquartersSelect.querySelector(`option[value="${sedeAdministrativa}"]`)) {
+                            const option = document.createElement('option');
+                            option.value = sedeAdministrativa;
+                            option.textContent = sedeAdministrativa;
+                            adminHeadquartersSelect.appendChild(option);
+                            option.setAttribute('data-lon', coordinates[0]);
+                            option.setAttribute('data-lat', coordinates[1]);
+                        }
+                    });
+                })
+                .catch(error => console.error('Error fetching data:', error));
+
+                var adminHeadquartersSelect = document.getElementById('admin-headquarters');
+              adminHeadquartersSelect.addEventListener('change', function (e) {
+                  var selectedOption = e.target.options[e.target.selectedIndex];
+                  var lon = parseFloat(selectedOption.getAttribute('data-lon'));
+                  var lat = parseFloat(selectedOption.getAttribute('data-lat'));
+
+                  if (!isNaN(lon) && !isNaN(lat)) {
+                      var zoomLevel = selectedOption.value === 'Alagoas' ? 7.8 : 10; // Definir o nível de zoom
+                      map.flyTo({
+                          center: [lon, lat],
+                          zoom: zoomLevel,
+                      });
+                  }
+              });
+        });
+    </script>
 </body>
+
 </html>
